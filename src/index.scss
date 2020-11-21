@@ -1,0 +1,18 @@
+@import '~normalize.css';
+
+body {
+  font-family: 'Comic Sans MS', 'Arial';
+}
+
+nav > a {
+  button {
+    background-color: #ffffff;
+  }
+  &.active > button {
+    background-color: #dddddd;
+  }
+}
+
+main {
+  margin: 16px;
+}

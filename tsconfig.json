@@ -1,0 +1,28 @@
+{
+  "exclude": [
+    "public",
+    "data"
+  ],
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    // "noEmit": true,
+    "incremental": true,
+    "target": "es6",
+    "outDir": "dist",
+    "module": "commonjs",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "skipLibCheck": true,
+    "jsx": "react",
+    "strict": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
