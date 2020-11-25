@@ -20,49 +20,56 @@ const resolve = (...dirs: string[]) => path.resolve(__dirname, ...dirs);
 const statsConfig = () =>
   devMode
     ? {
-        all: false,
-        assets: true,
-        cached: true,
-        colors: true,
-        hash: true,
-        builtAt: true,
-        timings: true,
-        errors: true,
-        errorDetails: true,
-        logging: 'info',
-        warnings: true,
-        version: true,
-        context: resolve('src'),
-      }
+      all: false,
+      assets: true,
+      cached: true,
+      colors: true,
+      hash: true,
+      builtAt: true,
+      timings: true,
+      errors: true,
+      errorDetails: true,
+      logging: 'info',
+      warnings: true,
+      version: true,
+      context: resolve('src'),
+    }
     : { preset: 'normal' };
 
 // not used in an SPA, uncomment for traditional multi-page app
 // also uncomment anything labeled "non-SPA"
-// const entrypoints: {
-//   chunk: string;
-//   entry: string;
-//   output: string;
-//   title?: string;
-//   publicPath?: RegExp;
-// }[] = [
-//   {
-//     chunk: 'main',
-//     entry: resolve('src/index.tsx'),
-//     output: 'index.html',
-//     title: 'hello world',
-//     publicPath: /^\/$/g,
-//   },
-// ];
+const entrypoints: {
+  chunk: string;
+  entry: string;
+  output: string;
+  title?: string;
+  publicPath?: RegExp;
+}[] = [
+    {
+      chunk: 'main',
+      entry: resolve('src/home/home.tsx'),
+      output: 'index.html',
+      title: 'hello world',
+      publicPath: /^\/$/,
+    },
+    {
+      chunk: 'play',
+      entry: resolve('src/play/play.tsx'),
+      output: 'play.html',
+      title: 'oo oo aa aa',
+      publicPath: /^\/play$/,
+    },
+  ];
 
 export default <Configuration>{
   mode: devMode ? 'development' : 'production',
   // SPA
-  entry: './src/index.tsx',
+  // entry: './src/index.tsx',
   // non-SPA
-  // entry: entrypoints.reduce(
-  //   (obj, item) => ((obj[item.chunk] = resolve(item.entry)), obj),
-  //   {} as Record<string, string>
-  // ),
+  entry: entrypoints.reduce(
+    (obj, item) => ((obj[item.chunk] = resolve(item.entry)), obj),
+    {} as Record<string, string>
+  ),
   output: {
     filename: devMode ? '[name].js' : '[name].[contenthash].js',
     chunkFilename: devMode ? '[name].js' : '[name].[contenthash].js',
@@ -79,24 +86,24 @@ export default <Configuration>{
   stats: statsConfig(),
   devtool: devMode ? 'eval-cheap-module-source-map' : 'source-map',
   devServer: {
-    historyApiFallback: {
-      // SPA
-      rewrites: [{ from: /^.*$/, to: '/' }],
-      // non-SPA
-      // rewrites: entrypoints.map(item => ({
-      //   from: item.publicPath ?? new RegExp(`^/${item.chunk}$`),
-      //   to: '/' + item.output,
-      // })),
-    },
-    host: '0.0.0.0',
+    // historyApiFallback: {
+    //   // SPA
+    //   // rewrites: [{ from: /^.*$/, to: '/' }],
+    //   // non-SPA
+    //   rewrites: entrypoints.map(item => ({
+    //     from: item.publicPath ?? new RegExp(`^/${item.chunk}$`),
+    //     to: '/' + item.output,
+    //   })),
+    // },
+    // host: '0.0.0.0',
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
-    public: `http://localhost:${process.env.PORT}`,
-    contentBase: [resolve('public')],
-    stats: statsConfig(),
+    // public: `http://localhost:${process.env.PORT}`,
+    // contentBase: [resolve('public')],
+    // stats: statsConfig(),
   } as WDSConfiguration,
   plugins: [
     new RemovePlugin({
@@ -123,61 +130,61 @@ export default <Configuration>{
     }),
     new ScriptExtHTMLPlugin({ defaultAttribute: 'defer' }),
     // SPA
-    new HTMLPlugin({
-      template: resolve('src/template.ejs'),
-      filename: 'index.html',
-      minify: 'auto',
-      title: 'your title here',
-      chunks: ['main'],
-    }),
+    // new HTMLPlugin({
+    //   template: resolve('src/template.ejs'),
+    //   filename: 'index.html',
+    //   minify: 'auto',
+    //   title: 'your title here',
+    //   chunks: ['main'],
+    // }),
     // non-SPA
-    // ...entrypoints.map(
-    //   item =>
-    //     new HTMLPlugin({
-    //       template: resolve('src/template.ejs'),
-    //       filename: item.output,
-    //       chunks: [item.chunk],
-    //       title: item.title,
-    //     })
-    // ),
+    ...entrypoints.map(
+      item =>
+        new HTMLPlugin({
+          template: resolve('src/template.ejs'),
+          filename: item.output,
+          chunks: [item.chunk],
+          title: item.title,
+        })
+    ),
     ...(devMode
       ? []
       : [
-          new MiniCSSExtractPlugin({
-            filename: devMode ? '[name].css' : '[name].[contenthash].css',
-            chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
-            esModule: true,
-          }),
-          new OptimzeCSSAssetsPlugin(),
-        ]),
+        new MiniCSSExtractPlugin({
+          filename: devMode ? '[name].css' : '[name].[contenthash].css',
+          chunkFilename: devMode ? '[name].css' : '[name].[contenthash].css',
+          esModule: true,
+        }),
+        new OptimzeCSSAssetsPlugin(),
+      ]),
   ],
   optimization: devMode
     ? {
-        runtimeChunk: 'single',
-        minimize: false,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
-        splitChunks: false,
-      }
+      runtimeChunk: 'single',
+      minimize: false,
+      removeAvailableModules: false,
+      removeEmptyChunks: false,
+      splitChunks: false,
+    }
     : {
-        minimize: true,
-        minimizer: [
-          new TerserPlugin({
-            test: /\.(j|t)sx?$/i,
-            extractComments: false,
-          }),
-        ],
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            gamelib: {
-              test: /[\\/]node_modules[\\/](pixi-js|@pixi\/.+)[\\/]/,
-              chunks: 'all',
-              priority: 5,
-            },
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          test: /\.(j|t)sx?$/i,
+          extractComments: false,
+        }),
+      ],
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          gamelib: {
+            test: /[\\/]node_modules[\\/](pixi-js|@pixi\/.+)[\\/]/,
+            chunks: 'all',
+            priority: 5,
           },
         },
       },
+    },
   module: {
     rules: [
       { test: /\.(jpe?g|png|gif|mp3|ttf|eot|woff)$/i, loader: 'file-loader' },
