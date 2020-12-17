@@ -8,8 +8,7 @@ const App = (props: {}) => {
   return (
     <>
       <div>
-        something
-        <a href="play">play</a>
+        <a href="play">adfasfasdfasdfasddf</a>
       </div>
     </>
   );

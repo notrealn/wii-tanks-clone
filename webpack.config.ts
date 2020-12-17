@@ -86,24 +86,24 @@ export default <Configuration>{
   stats: statsConfig(),
   devtool: devMode ? 'eval-cheap-module-source-map' : 'source-map',
   devServer: {
-    // historyApiFallback: {
-    //   // SPA
-    //   // rewrites: [{ from: /^.*$/, to: '/' }],
-    //   // non-SPA
-    //   rewrites: entrypoints.map(item => ({
-    //     from: item.publicPath ?? new RegExp(`^/${item.chunk}$`),
-    //     to: '/' + item.output,
-    //   })),
-    // },
-    // host: '0.0.0.0',
+    historyApiFallback: {
+      // SPA
+      // rewrites: [{ from: /^.*$/, to: '/' }],
+      // non-SPA
+      rewrites: entrypoints.map(item => ({
+        from: item.publicPath ?? new RegExp(`^/${item.chunk}$`),
+        to: '/' + item.output,
+      })),
+    },
+    host: '0.0.0.0',
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
-    // public: `http://localhost:${process.env.PORT}`,
-    // contentBase: [resolve('public')],
-    // stats: statsConfig(),
+    public: `http://localhost:${process.env.PORT}`,
+    contentBase: [resolve('public')],
+    stats: statsConfig(),
   } as WDSConfiguration,
   plugins: [
     new RemovePlugin({
@@ -145,6 +145,7 @@ export default <Configuration>{
           filename: item.output,
           chunks: [item.chunk],
           title: item.title,
+          inject: false,
         })
     ),
     ...(devMode

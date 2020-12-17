@@ -1,16 +1,15 @@
 {
-  "exclude": [
-    "public",
-    "data",
-    "src"
+  "include": [
+    "."
   ],
+  "exclude": [],
   "compilerOptions": {
     "experimentalDecorators": true,
     // "noEmit": true,
     "incremental": true,
-    "target": "es6",
-    "outDir": "dist",
-    "module": "commonjs",
+    "target": "es2020",
+    "outDir": "../dist",
+    "module": "esnext",
     "lib": [
       "DOM",
       "ESNext"
