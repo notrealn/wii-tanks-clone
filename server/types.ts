@@ -1,4 +1,5 @@
-import { Entity, Player } from "./entity";
+import { Entity } from "./entities/entity";
+import { Player } from "./entities/player";
 
 export interface GameState {
   entities: Entity[];
@@ -14,4 +15,6 @@ export interface GamePad {
   m2: boolean;
 }
 
-export type Projection = [min: number, max: number];
+export type Range = [min: number, max: number];
+
+export type EntityType = 'Entity' | 'Bullet' | 'Player'

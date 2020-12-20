@@ -3,7 +3,8 @@ import express from 'express';
 import { Server, Socket } from 'socket.io';
 import { GamePad, GameState } from './types';
 import { createServer, Server as HttpServer } from 'http';
-import { Entity, Player } from './entity';
+import { Entity } from './entities/entity';
+import { Player } from "./entities/player";
 // import { Point } from 'pixi.js';
 
 export class Game {
@@ -43,8 +44,8 @@ export class Game {
 
       socket.on('disconnect', () => {
         this.state.players = this.state.players.filter(player => player.id != socket.id);
-        socket.emit('remove', socket.id)
         console.log(`${socket.id} left`);
+        this.io.emit('remove', socket.id)
       });
 
       socket.on('input', (gamepad: GamePad) => {

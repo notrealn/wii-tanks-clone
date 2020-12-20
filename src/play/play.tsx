@@ -6,7 +6,7 @@ import { renderApp } from '../../src/util';
 import { KeyHandler } from './keyhandler'
 import { GameState } from '../../server/types';
 import './style.scss';
-import { Player } from '../../server/entity';
+import { Player } from '../../server/entities/player';
 
 const App = (props: {}) => {
   return (
@@ -48,6 +48,7 @@ socket.on('tick', (state: GameState) => {
   for (const player of state.players) {
     const p = clientState.players[player.id];
     if (p == null) {
+      console.log('adding player ' + player.id)
       clientState.players[player.id] = new ClientPlayer(player.id);
       app.stage.addChild(clientState.players[player.id]);
     }
@@ -57,6 +58,12 @@ socket.on('tick', (state: GameState) => {
     // console.log(clientState);
   }
 })
+
+socket.on('remove', (id: string) => {
+  console.log('removing player ' + id)
+  app.stage.removeChild(clientState.players[id])
+  delete clientState.players[id];
+});
 
 setInterval(() => {
   socket.emit('input', keyhandler.gamepad);

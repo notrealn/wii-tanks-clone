@@ -2,7 +2,7 @@
   "exclude": [
     "public",
     "data",
-    "src"
+    "src",
   ],
   "compilerOptions": {
     "experimentalDecorators": true,

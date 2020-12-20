@@ -1,4 +1,4 @@
-import { Vector } from '../../server/entity';
+import { Vector } from '../../server/vector';
 import { GamePad } from '../../server/types';
 
 export class KeyHandler {
