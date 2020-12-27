@@ -4,11 +4,14 @@ import { Server, Socket } from 'socket.io';
 import { GamePad, GameState } from './types';
 import { createServer, Server as HttpServer } from 'http';
 import { Entity } from './entities/entity';
-import { Player } from "./entities/player";
-// import { Point } from 'pixi.js';
+import { Player } from './entities/player';
+import { Map } from './world/map';
+import { Blocks } from './world/block';
+import { Tile } from './world/tile';
 
 export class Game {
   state: GameState;
+  map: Map;
   public static readonly PORT: number = 6969;
   private _app: express.Application;
   private server: HttpServer;
@@ -25,10 +28,11 @@ export class Game {
       entities: [],
       players: [],
     };
+    this.map = new Map().setTile(1, 1, Blocks.wall).setTile(15, 11, Blocks.wall);
 
     setInterval(() => {
-      this.state.entities.forEach((entity: Entity) => entity.update(this.state));
-      this.state.players.forEach((player: Player) => player.update(this.state));
+      this.state.entities.forEach((entity: Entity) => entity.update(this.state, this.map));
+      this.state.players.forEach((player: Player) => player.update(this.state, this.map));
       this.io.emit('tick', this.state);
     }, 1000 / 24);
   }
@@ -40,6 +44,7 @@ export class Game {
 
     this.io.on('connection', (socket: Socket) => {
       this.state.players.push(new Player(socket.id).setPos(100, 100));
+      this.io.to(socket.id).emit('map', this.map)
       console.log(`${socket.id} joined`);
 
       socket.on('disconnect', () => {

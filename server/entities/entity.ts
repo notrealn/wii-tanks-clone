@@ -1,9 +1,11 @@
-import { Game } from "../game";
-import { EntityType } from "../types";
-import { Vector } from "../vector";
+import { Game } from '../game';
+import { Block } from '../world/block';
+import { Map } from '../world/map'
+import { Vector } from '../vector';
+import { Tile } from '../world/tile';
 
 export class Entity {
-  entityType: EntityType = 'Entity'
+  name: string = 'entity'
   pos: Vector
   vel: Vector
   size: number
@@ -18,7 +20,7 @@ export class Entity {
     this.anchor = new Vector(0.5, 0.5)
   }
 
-  update(state: Game['state']) {
+  update(state: Game['state'], map: Map) {
     this.pos = this.pos.add(this.vel)
     this.vel = this.vel.multiply(0.5)
   }
@@ -49,6 +51,21 @@ export class Entity {
     }
 
     return true;
+  }
+
+  checkMapCollision(map: Map): Vector | false {
+    for (const vertex of this.vertices) {
+      const x = Math.floor(vertex.x / 32)
+      const y = Math.floor(vertex.y / 32)
+      if (!map.inBounds(new Vector(x, y))) {
+        return new Vector(x, y);
+      }
+
+      if (map.tiles[x + y * map.width].block.solid) {
+        return map.tiles[x + y * map.width].pos;
+      }
+    }
+    return false;
   }
 
   applyForce(direction: number, magnitude: number) {

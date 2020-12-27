@@ -1,5 +1,6 @@
-import { Entity } from "./entities/entity";
-import { Player } from "./entities/player";
+import { Entity } from './entities/entity';
+import { Player } from './entities/player';
+import { Block } from './world/block';
 
 export interface GameState {
   entities: Entity[];
@@ -15,6 +16,8 @@ export interface GamePad {
   m2: boolean;
 }
 
-export type Range = [min: number, max: number];
+export interface MapObject {
+  blocks: Block[]
+}
 
-export type EntityType = 'Entity' | 'Bullet' | 'Player'
+export type Range = [min: number, max: number];

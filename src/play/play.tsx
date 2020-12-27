@@ -1,17 +1,19 @@
 import React from 'react';
 import io from 'socket.io-client';
-import { Application, Graphics, Loader, Sprite, Texture, utils } from "pixi.js";
+import { Application, Graphics, Loader, Sprite, Texture, utils } from 'pixi.js';
 import { renderApp } from '../../src/util';
 
 import { KeyHandler } from './keyhandler'
 import { GameState } from '../../server/types';
 import './style.scss';
 import { Player } from '../../server/entities/player';
+import { Tile } from '../../server/world/tile';
+import { Map } from '../../server/world/map';
 
 const App = (props: {}) => {
   return (
     <>
-      <div id="game"></div>
+      <div id='game'></div>
     </>
   );
 };
@@ -20,7 +22,7 @@ renderApp(<App />);
 
 const socket = io('ws://192.168.86.35:3000', { transports: ['websocket'] });
 
-socket.on("connect", () => {
+socket.on('connect', () => {
   console.log(`connected, socket id is ${socket.id}`);
 });
 
@@ -43,6 +45,31 @@ app.stage.addChild(background)
 const clientState: ClientState = {
   players: {}
 };
+
+const map: ClientMap = {
+  tiles: [],
+  width: 0,
+  height: 0,
+}
+
+socket.on('map', (req: Map) => {
+  map.tiles = req.tiles;
+  map.width = req.width;
+  map.height = req.height;
+  console.log(map);
+  for (const tile of map.tiles) {
+    let fillColor = 0xffffff;
+
+    if (tile.block.name == 'air') continue;
+    if (tile.block.name == 'wall') fillColor = 0x000000;
+    console.log(tile)
+    const graphic = new Graphics()
+      .beginFill(fillColor)
+      .drawRect(tile.pos.x * 32, tile.pos.y * 32, 32, 32)
+      .endFill();
+    app.stage.addChild(graphic)
+  }
+});
 
 socket.on('tick', (state: GameState) => {
   for (const player of state.players) {
@@ -83,4 +110,10 @@ interface ClientState {
   players: {
     [id: string]: ClientPlayer;
   }
+}
+
+interface ClientMap {
+  tiles: Tile[]
+  width: number
+  height: number
 }

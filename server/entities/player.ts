@@ -1,15 +1,20 @@
-import { Game } from "../game";
-import { EntityType, GamePad } from "../types";
-import { Entity } from "./entity";
-import { Vector } from "../vector";
-
+import { Game } from '../game';
+import { GamePad } from '../types';
+import { Entity } from './entity';
+import { Vector } from '../vector';
+import { Bullet } from './bullet';
+import { Map } from '../world/map';
+import { Blocks } from '../world/block';
+import { Tile } from '../world/tile';
 
 export class Player extends Entity {
-  entityType: EntityType = 'Player';
+  name: string = 'player';
   id: string;
   moveSpeed: number;
   turnSpeed: number;
   accel: Vector;
+  bullets: Bullet[];
+  maxBullets: number;
 
   constructor(id: string) {
     super();
@@ -18,17 +23,24 @@ export class Player extends Entity {
     this.turnSpeed = 0.2;
     this.accel = new Vector(0, 0);
     this.size = 24;
+    this.bullets = []
+    this.maxBullets = 4
   }
 
-  update(state: Game['state']) {
+  update(state: Game['state'], map: Map) {
     this.vel = this.vel.add(this.accel);
     state.players.forEach(other => {
       if (other == this)
         return;
       if (this.checkCollision(other))
-        this.collide(other);
+        this.collideEntity(other);
     });
-    super.update(state);
+
+    const mapCollideObject = this.checkMapCollision(map)
+    if (mapCollideObject)
+      this.collideMap(mapCollideObject)
+
+    super.update(state, map);
     // console.log(this.angle)
   }
 
@@ -47,8 +59,6 @@ export class Player extends Entity {
       foo.x++;
     if (foo.x == 0 && foo.y == 0)
       return this.accel = new Vector(0, 0);
-    if (gamepad.m1)
-      return false;
 
     // angle we want to be
     const angle = Math.atan2(-foo.y, foo.x) + Math.PI / 2;
@@ -69,10 +79,32 @@ export class Player extends Entity {
     );
   }
 
-  collide(other: Entity) {
-    switch (other.entityType) {
-      case 'Player':
+  shoot() {
+    if (this.bullets.length >= this.maxBullets) return false;
+
+  }
+
+  collideEntity(other: Entity) {
+    switch (other.name) {
+      case 'player':
         this.applyForce(Math.atan2(other.pos.y - this.pos.y, other.pos.x - this.pos.x), -this.moveSpeed / 2);
     }
+  }
+
+  collideMap(tile: Vector) {
+    const pushFactor = this.moveSpeed + 1;
+    // check if you are left of left side of tile
+    if (this.pos.x < tile.x * 32)
+      this.applyForce(Math.PI, pushFactor)
+    // check if you are right of right side of tile
+    if (this.pos.x > (tile.x + 1) * 32)
+      this.applyForce(Math.PI, -pushFactor)
+    // check if you are above top side of tile
+    if (this.pos.y < tile.y * 32)
+      this.applyForce(Math.PI / 2, -pushFactor)
+    // check if you are below
+    if (this.pos.y > (tile.y + 1) * 32)
+      this.applyForce(Math.PI / 2, pushFactor)
+    // else this.applyForce(Math.atan2(tile.y - this.pos.y, tile.x - this.pos.x), -this.moveSpeed);
   }
 }
