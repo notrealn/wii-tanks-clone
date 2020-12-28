@@ -40,8 +40,16 @@ export class Player extends Entity {
     if (mapCollideObject)
       this.collideMap(mapCollideObject)
 
+    state.players.forEach(other => {
+      for (let i = 0; i < other.bullets.length; i++) {
+        if (other.bullets[i].bounces > 1) {
+          delete other.bullets[i];
+        }
+      }
+    });
     super.update(state, map);
     // console.log(this.angle)
+
   }
 
   move(gamepad: GamePad) {
@@ -59,6 +67,8 @@ export class Player extends Entity {
       foo.x++;
     if (foo.x == 0 && foo.y == 0)
       return this.accel = new Vector(0, 0);
+    if (gamepad.m1)
+      this.shoot();
 
     // angle we want to be
     const angle = Math.atan2(-foo.y, foo.x) + Math.PI / 2;
@@ -80,7 +90,12 @@ export class Player extends Entity {
   }
 
   shoot() {
-    if (this.bullets.length >= this.maxBullets) return false;
+    if (this.bullets.length >= this.maxBullets){
+      let temp = new Bullet();
+      temp.pos = this.pos;
+      temp.vel = this.vel;
+      this.bullets.push(temp);
+    }
 
   }
 

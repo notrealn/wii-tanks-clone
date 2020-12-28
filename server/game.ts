@@ -1,5 +1,6 @@
 
 import express from 'express';
+import dotenv from 'dotenv';
 import { Server, Socket } from 'socket.io';
 import { GamePad, GameState } from './types';
 import { createServer, Server as HttpServer } from 'http';
@@ -9,10 +10,12 @@ import { Map } from './world/map';
 import { Blocks } from './world/block';
 import { Tile } from './world/tile';
 
+dotenv.config();
+
 export class Game {
   state: GameState;
   map: Map;
-  public static readonly PORT: number = 6969;
+  public static readonly PORT: number = parseInt(process.env.PORT || '6969');
   private _app: express.Application;
   private server: HttpServer;
   private io: Server;
