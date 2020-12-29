@@ -1,5 +1,5 @@
 # What is this?
-This was made as the final project for cs50.
+This webgame was made as the final project for cs50.
 
 # How do i play this?
 1. Clone this repository by typing `git clone https://github.com/notrealn/wii-tanks-clone.git .`
