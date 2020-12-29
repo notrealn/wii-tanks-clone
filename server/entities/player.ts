@@ -1,11 +1,9 @@
 import { Game } from '../game';
 import { GamePad } from '../types';
-import { Entity } from './entity';
 import { Vector } from '../vector';
-import { Bullet } from './bullet';
 import { Map } from '../world/map';
-import { Blocks } from '../world/block';
-import { Tile } from '../world/tile';
+import { Bullet } from './bullet';
+import { Entity } from './entity';
 
 export class Player extends Entity {
   name: string = 'player';

@@ -1,4 +1,3 @@
-import { Vector } from '../vector';
 
 export class Block {
   name: string

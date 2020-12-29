@@ -1,17 +1,13 @@
+import { Application, Sprite } from 'pixi.js';
 import React from 'react';
 import io from 'socket.io-client';
-import { Application, Graphics, Loader, Sprite, Texture, utils } from 'pixi.js';
-import { renderApp } from '../../src/util';
-
-import { KeyHandler } from './keyhandler'
 import { GameState } from '../../server/types';
-import './style.scss';
-import { Player } from '../../server/entities/player';
-import { Tile } from '../../server/world/tile';
 import { Map } from '../../server/world/map';
-import { Client } from 'socket.io/dist/client';
-import { ClientBullet, ClientPlayer, ClientState, ClientMap, ClientWall, ClientTurret } from './client-class';
-import { Wall } from '../../server/world/block';
+import { renderApp } from '../../src/util';
+import { ClientBullet, ClientMap, ClientPlayer, ClientState, ClientTurret, ClientWall } from './client-class';
+import { KeyHandler } from './keyhandler';
+import './style.scss';
+
 
 const App = (props: {}) => {
   return (
@@ -23,7 +19,8 @@ const App = (props: {}) => {
 
 renderApp(<App />);
 
-const socket = io('ws://192.168.86.35:3000', { transports: ['websocket'] });
+// const socket = io('ws://192.168.86.35:3000', { transports: ['websocket'] });
+const socket = io();
 
 socket.on('connect', () => {
   console.log(`connected, socket id is ${socket.id}`);

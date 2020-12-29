@@ -1,5 +1,5 @@
-import { Vector } from '../../server/vector';
 import { GamePad } from '../../server/types';
+import { Vector } from '../../server/vector';
 
 export class KeyHandler {
   keys: { [key: string]: boolean }

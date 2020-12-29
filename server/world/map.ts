@@ -1,5 +1,5 @@
 import { Vector } from '../vector';
-import { Block, Blocks } from './block'
+import { Block } from './block';
 import { Tile } from './tile';
 
 export class Map {

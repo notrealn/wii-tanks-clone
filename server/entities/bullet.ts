@@ -1,9 +1,7 @@
 import { Game } from '../game';
 import { Vector } from '../vector';
-import { Entity } from './entity';
 import { Map } from '../world/map';
-import { Tile } from '../world/tile';
-import { Blocks } from '../world/block';
+import { Entity } from './entity';
 import { Player } from './player';
 
 export class Bullet extends Entity {

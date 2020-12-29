@@ -1,8 +1,6 @@
 import { Game } from '../game';
-import { Block } from '../world/block';
-import { Map } from '../world/map'
 import { Vector } from '../vector';
-import { Tile } from '../world/tile';
+import { Map } from '../world/map';
 
 export class Entity {
   name: string = 'entity'

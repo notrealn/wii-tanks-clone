@@ -1,13 +1,13 @@
 
-import express from 'express';
 import dotenv from 'dotenv';
-import { Server, Socket } from 'socket.io';
-import { GamePad, GameState } from './types';
+import express from 'express';
 import { createServer, Server as HttpServer } from 'http';
+import { Server, Socket } from 'socket.io';
 import { Entity } from './entities/entity';
 import { Player } from './entities/player';
-import { Map } from './world/map';
+import { GamePad, GameState } from './types';
 import { Blocks } from './world/block';
+import { Map } from './world/map';
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ export class Game {
   constructor() {
     this._app = express();
     this.port = process.env.PORT || Game.PORT;
-    this.server = createServer(this._app).listen(3000);
+    this.server = createServer(this._app);
     this.io = new Server(this.server);
     this.listen();
     this.state = {
@@ -54,7 +54,7 @@ export class Game {
   }
 
   private listen(): void {
-    const listener = this.app.listen(process.env.PORT, () => {
+    const listener = this.server.listen(process.env.PORT, () => {
       console.log('Listening at http://localhost:' + this.port);
     });
 
