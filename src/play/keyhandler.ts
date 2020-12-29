@@ -9,7 +9,7 @@ export class KeyHandler {
     pos: Vector
   }
 
-  constructor() {
+  constructor(canvas: Element) {
     this.keys = {}
     this.mouse = {
       m1: false,
@@ -32,9 +32,12 @@ export class KeyHandler {
       this.mouse.m1 = false;
     });
 
-    document.addEventListener('mousemove', (e) => {
-      this.mouse.pos.x = e.offsetX;
-      this.mouse.pos.y = e.offsetY;
+    canvas.addEventListener('mousemove', (e) => {
+      // we need to convert their on screen pixels into the in game pixels
+      // divide their x by width of canvas and multiply by width of game
+      this.mouse.pos.x = (e as MouseEvent).offsetX / canvas.clientWidth * 512;
+      this.mouse.pos.y = (e as MouseEvent).offsetY / canvas.clientHeight * 384;
+      // console.log(`canvas width: ${canvas.clientWidth}, offsetx: ${(e as MouseEvent).offsetX}, mousex: ${this.mouse.pos.x}`)
     });
   }
 
@@ -44,8 +47,7 @@ export class KeyHandler {
       down: this.keys.s,
       left: this.keys.a,
       right: this.keys.d,
-      m1: false,
-      m2: false,
+      mouse: this.mouse
     }
   }
 }

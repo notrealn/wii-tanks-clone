@@ -8,7 +8,6 @@ import { Entity } from './entities/entity';
 import { Player } from './entities/player';
 import { Map } from './world/map';
 import { Blocks } from './world/block';
-import { Tile } from './world/tile';
 
 dotenv.config();
 
@@ -31,11 +30,25 @@ export class Game {
       entities: [],
       players: [],
     };
-    this.map = new Map().setTile(1, 1, Blocks.wall).setTile(15, 11, Blocks.wall);
+    this.map = new Map();
+    for (let i = 0; i < 5; i++) {
+      this.map.setTile(Math.floor(Math.random() * 16), Math.floor(Math.random() * 12), Blocks.wall)
+    }
 
     setInterval(() => {
-      this.state.entities.forEach((entity: Entity) => entity.update(this.state, this.map));
-      this.state.players.forEach((player: Player) => player.update(this.state, this.map));
+      this.state.entities.forEach((entity: Entity) => {
+        if (entity.delete) this.state.entities = this.state.entities.filter((e) => e == entity)
+
+        entity.update(this.state, this.map)
+      });
+      this.state.players.forEach((player: Player) => {
+        if (player.delete) {
+          this.state.players = this.state.players.filter(e => player.id != e.id);
+          this.io.emit('remove', player.id)
+        }
+
+        player.update(this.state, this.map)
+      });
       this.io.emit('tick', this.state);
     }, 1000 / 24);
   }
@@ -46,7 +59,7 @@ export class Game {
     });
 
     this.io.on('connection', (socket: Socket) => {
-      this.state.players.push(new Player(socket.id).setPos(100, 100));
+      this.state.players.push(new Player(socket.id).setPos(Math.floor(Math.random() * 512), Math.floor(Math.random() * 384)));
       this.io.to(socket.id).emit('map', this.map)
       console.log(`${socket.id} joined`);
 
@@ -58,8 +71,9 @@ export class Game {
 
       socket.on('input', (gamepad: GamePad) => {
         const player = this.state.players.find(player => player.id == socket.id);
-        if (player) player.move(gamepad)
-        else console.log('a')
+        if (!player) return;
+        if (player.freezeFrames > 0) return
+        player.move(gamepad)
         // console.log(socket.id + ' ' + JSON.stringify(this.state.players))
       });
     });

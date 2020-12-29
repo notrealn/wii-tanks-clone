@@ -15,46 +15,65 @@ export class Player extends Entity {
   accel: Vector;
   bullets: Bullet[];
   maxBullets: number;
+  freezeFrames: number;
+  turretAngle: number;
+  dead: boolean;
 
   constructor(id: string) {
     super();
+    this.dead = false;
     this.id = id;
-    this.moveSpeed = 1;
+    this.moveSpeed = 2;
     this.turnSpeed = 0.2;
     this.accel = new Vector(0, 0);
     this.size = 24;
     this.bullets = []
     this.maxBullets = 4
+    this.freezeFrames = 0;
+    this.turretAngle = 0;
   }
 
   update(state: Game['state'], map: Map) {
-    this.vel = this.vel.add(this.accel);
-    state.players.forEach(other => {
-      if (other == this)
+    for (let i = 0; i < this.maxBullets; i++) {
+      if (!this.bullets[i])
+        continue;
+      this.bullets[i].update(state, map)
+      if (this.bullets[i].delete)
+        delete this.bullets[i]
+    }
+
+    if (this.dead) return;
+
+    state.players.forEach(player => {
+      if (player.id == this.id)
         return;
-      if (this.checkCollision(other))
-        this.collideEntity(other);
+      if (this.checkCollision(player))
+        this.collideEntity(player);
+      player.bullets.forEach(bullet => {
+        if (this.checkCollision(bullet))
+          this.collideEntity(bullet)
+      })
     });
 
     const mapCollideObject = this.checkMapCollision(map)
     if (mapCollideObject)
       this.collideMap(mapCollideObject)
 
-    state.players.forEach(other => {
-      for (let i = 0; i < other.bullets.length; i++) {
-        if (other.bullets[i].bounces > 1) {
-          delete other.bullets[i];
-        }
-      }
-    });
+    if (this.freezeFrames > 0) return this.freezeFrames--;
+
+    this.vel = this.vel.add(this.accel);
+
     super.update(state, map);
     // console.log(this.angle)
 
   }
 
   move(gamepad: GamePad) {
+    if (this.dead) return;
     this.angle = this.angle < 0 ? Math.PI * 2 + this.angle : this.angle;
     this.angle %= Math.PI * 2;
+
+    this.turretAngle = Math.atan2(gamepad.mouse.pos.x - this.pos.x, this.pos.y - gamepad.mouse.pos.y);
 
     const foo = new Vector(0, 0);
     if (gamepad.up)
@@ -65,10 +84,10 @@ export class Player extends Entity {
       foo.x--;
     if (gamepad.right)
       foo.x++;
+    if (gamepad.mouse.m1)
+      this.shoot();
     if (foo.x == 0 && foo.y == 0)
       return this.accel = new Vector(0, 0);
-    if (gamepad.m1)
-      this.shoot();
 
     // angle we want to be
     const angle = Math.atan2(-foo.y, foo.x) + Math.PI / 2;
@@ -90,19 +109,23 @@ export class Player extends Entity {
   }
 
   shoot() {
-    if (this.bullets.length >= this.maxBullets){
-      let temp = new Bullet();
-      temp.pos = this.pos;
-      temp.vel = this.vel;
-      this.bullets.push(temp);
-    }
+    for (let i = 0; i < this.maxBullets; i++) {
+      if (!this.bullets[i]) {
+        this.freezeFrames = 5;
 
+        return this.bullets[i] = new Bullet(this, this.turretAngle)
+      }
+    }
   }
 
   collideEntity(other: Entity) {
     switch (other.name) {
       case 'player':
-        this.applyForce(Math.atan2(other.pos.y - this.pos.y, other.pos.x - this.pos.x), -this.moveSpeed / 2);
+        this.applyForce(Math.atan2(other.pos.x - this.pos.x, this.pos.y - other.pos.y), -this.moveSpeed / 2);
+        break;
+      case 'bullet':
+        this.dead = true
+        console.log(this.id + ' died')
     }
   }
 
@@ -110,16 +133,15 @@ export class Player extends Entity {
     const pushFactor = this.moveSpeed + 1;
     // check if you are left of left side of tile
     if (this.pos.x < tile.x * 32)
-      this.applyForce(Math.PI, pushFactor)
+      this.applyForce(Math.PI / 2, -pushFactor)
     // check if you are right of right side of tile
     if (this.pos.x > (tile.x + 1) * 32)
-      this.applyForce(Math.PI, -pushFactor)
+      this.applyForce(Math.PI / 2, pushFactor)
     // check if you are above top side of tile
     if (this.pos.y < tile.y * 32)
-      this.applyForce(Math.PI / 2, -pushFactor)
+      this.applyForce(0, pushFactor)
     // check if you are below
     if (this.pos.y > (tile.y + 1) * 32)
-      this.applyForce(Math.PI / 2, pushFactor)
-    // else this.applyForce(Math.atan2(tile.y - this.pos.y, tile.x - this.pos.x), -this.moveSpeed);
+      this.applyForce(0, -pushFactor)
   }
 }

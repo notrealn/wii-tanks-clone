@@ -8,9 +8,11 @@ export class Entity {
   name: string = 'entity'
   pos: Vector
   vel: Vector
+  airRes!: number
   size: number
   angle: number
   anchor: Vector
+  delete!: boolean
 
   constructor() {
     this.pos = new Vector(0, 0);
@@ -22,7 +24,7 @@ export class Entity {
 
   update(state: Game['state'], map: Map) {
     this.pos = this.pos.add(this.vel)
-    this.vel = this.vel.multiply(0.5)
+    this.vel = this.vel.multiply(this.airRes | 0.5)
   }
 
   checkCollision(other: Entity): boolean {
@@ -69,14 +71,19 @@ export class Entity {
   }
 
   applyForce(direction: number, magnitude: number) {
-    this.vel = this.vel.add(new Vector(
-      Math.cos(direction) * magnitude,
-      Math.sin(direction) * magnitude,
+    return this.vel = this.vel.add(new Vector(
+      Math.cos(direction - Math.PI / 2) * magnitude,
+      Math.sin(direction - Math.PI / 2) * magnitude,
     ));
   }
 
   setPos(x: number, y: number) {
     this.pos = new Vector(x, y);
+    return this;
+  }
+
+  setVel(x: number, y: number) {
+    this.vel = new Vector(x, y);
     return this;
   }
 
