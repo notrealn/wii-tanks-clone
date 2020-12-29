@@ -2,7 +2,7 @@
 This was made as the final project for cs50.
 
 # How do i play this?
-1. Clone this repository
+1. Clone this repository by typing `git clone https://github.com/notrealn/wii-tanks-clone.git .`
 2. Make a .env file and put in `PORT=6969`
 3. Get npm from [here](https://nodejs.org/en/).
 4. Run `npm add -g yarn` to get yarn.
