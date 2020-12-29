@@ -8,7 +8,9 @@ const App = (props: {}) => {
   return (
     <>
       <div>
-        <a href="play">adfasfasdfasdfasddf</a>
+        <h1>Wii Tanks Clone!!!</h1>
+        The controls are wsad to move and click to shoot.
+        <button><a href="play">Play</a></button>
       </div>
     </>
   );
